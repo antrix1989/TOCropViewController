@@ -109,12 +109,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     if (!CGSizeEqualToSize(CGSizeZero, self.cropViewOriginalAspectRatio)) {
         CGSize aspectRatio = self.cropViewOriginalAspectRatio;
         
-        if (self.cropView.cropBoxAspectRatioIsPortrait) {
-            CGFloat width = aspectRatio.width;
-            aspectRatio.width = aspectRatio.height;
-            aspectRatio.height = width;
-        }
-        
         [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:NO];
         self.cropView.originalAspectRatio = self.cropViewOriginalAspectRatio;
     }
