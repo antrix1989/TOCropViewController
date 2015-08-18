@@ -100,6 +100,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.clampButtonTapped =    ^{ [weakSelf showAspectRatioDialog]; };
     self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
     self.toolbar.clampButton.hidden = self.hideClampButton;
+    self.toolbar.resetButton.hidden = true;
     
     self.transitioningDelegate = self;
     
@@ -255,7 +256,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)resetCropViewLayout
 {
     [self.cropView resetLayoutToDefaultAnimated:YES];
-    self.cropView.aspectLockEnabled = NO;
+    self.cropView.aspectLockEnabled = YES;
     self.toolbar.clampButtonGlowing = NO;
 }
 
@@ -263,7 +264,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)showAspectRatioDialog
 {
     if (self.cropView.aspectLockEnabled) {
-        self.cropView.aspectLockEnabled = NO;
+        self.cropView.aspectLockEnabled = YES;
         self.toolbar.clampButtonGlowing = NO;
         return;
     }
