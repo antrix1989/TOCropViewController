@@ -58,6 +58,10 @@
 
 @interface TOCropViewController : UIViewController
 
+@property (nonatomic) BOOL hideClampButton;
+
+@property (nonatomic) CGSize cropViewOriginalAspectRatio;
+
 /**
  The original, uncropped image that was passed to this controller.
  */
@@ -78,8 +82,8 @@
  */
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
 
-/** 
- If `showActivitySheetOnDone` is true, then these activity items will be supplied to that UIActivityViewController 
+/**
+ If `showActivitySheetOnDone` is true, then these activity items will be supplied to that UIActivityViewController
  in addition to the `TOActivityCroppedImageProvider` object.
  */
 @property (nonatomic, strong) NSArray *activityItems;

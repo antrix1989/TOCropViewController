@@ -33,6 +33,8 @@
 
 @interface TOCropView : UIView
 
+@property (nonatomic) CGSize originalAspectRatio;
+
 /**
  The image that the crop view is displaying. This cannot be changed once the crop view is instantiated.
  */

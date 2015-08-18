@@ -31,6 +31,10 @@
 @property (nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nonatomic, copy) void (^resetButtonTapped)(void);
 
+@property (nonatomic, strong) UIButton *rotateButton;
+@property (nonatomic, strong) UIButton *resetButton;
+@property (nonatomic, strong) UIButton *clampButton;
+
 /* Aspect ratio button settings */
 @property (nonatomic, assign) BOOL clampButtonGlowing;
 @property (nonatomic, readonly) CGRect clampButtonFrame;

@@ -234,6 +234,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f);
     self.cropBoxFrame = frame;
     
+    if (!CGSizeEqualToSize(CGSizeZero, self.originalAspectRatio)) {
+        [self setAspectLockEnabledWithAspectRatio:self.originalAspectRatio animated:NO];
+    }
+    
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedSize = self.cropBoxFrame.size;
     self.cropBoxLastEditedAngle = 0;

@@ -72,6 +72,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
+        self.cropViewOriginalAspectRatio = CGSizeZero;
     }
     
     return self;
@@ -80,7 +81,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
     self.cropView = [[TOCropView alloc] initWithImage:self.image];
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
@@ -98,10 +99,24 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.resetButtonTapped =    ^{ [weakSelf resetCropViewLayout]; };
     self.toolbar.clampButtonTapped =    ^{ [weakSelf showAspectRatioDialog]; };
     self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
+    self.toolbar.clampButton.hidden = self.hideClampButton;
     
     self.transitioningDelegate = self;
     
     self.view.backgroundColor = self.cropView.backgroundColor;
+    
+    if (!CGSizeEqualToSize(CGSizeZero, self.cropViewOriginalAspectRatio)) {
+        CGSize aspectRatio = self.cropViewOriginalAspectRatio;
+        
+        if (self.cropView.cropBoxAspectRatioIsPortrait) {
+            CGFloat width = aspectRatio.width;
+            aspectRatio.width = aspectRatio.height;
+            aspectRatio.height = width;
+        }
+        
+        [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:NO];
+        self.cropView.originalAspectRatio = self.cropViewOriginalAspectRatio;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -207,7 +222,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         self.snapshotView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin;
     
     [self.view addSubview:self.snapshotView];
-
+    
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     [self.toolbar layoutIfNeeded];
     
@@ -259,13 +274,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                                                     cancelButtonTitle:NSLocalizedStringFromTable(@"Cancel", @"TOCropViewControllerLocalizable", nil)
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:NSLocalizedStringFromTable(@"Original", @"TOCropViewControllerLocalizable", nil),
-                                                                      NSLocalizedStringFromTable(@"Square", @"TOCropViewControllerLocalizable", nil),
-                                                                      verticalCropBox ? @"2:3" : @"3:2",
-                                                                      verticalCropBox ? @"3:5" : @"5:3",
-                                                                      verticalCropBox ? @"3:4" : @"4:3",
-                                                                      verticalCropBox ? @"4:5" : @"5:4",
-                                                                      verticalCropBox ? @"5:7" : @"7:5",
-                                                                      verticalCropBox ? @"9:16" : @"16:9",nil];
+                                  NSLocalizedStringFromTable(@"Square", @"TOCropViewControllerLocalizable", nil),
+                                  verticalCropBox ? @"2:3" : @"3:2",
+                                  verticalCropBox ? @"3:5" : @"5:3",
+                                  verticalCropBox ? @"3:4" : @"4:3",
+                                  verticalCropBox ? @"4:5" : @"5:4",
+                                  verticalCropBox ? @"5:7" : @"7:5",
+                                  verticalCropBox ? @"9:16" : @"16:9",nil];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
@@ -337,7 +352,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 {
     self.transitionController.image = self.image;
     self.transitionController.fromFrame = frame;
-
+    
     __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
         typeof (self) strongSelf = weakSelf;
@@ -357,7 +372,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.transitionController.image = image;
     self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.cropBoxFrame toView:self.view];
     self.transitionController.toFrame = frame;
-
+    
     [viewController dismissViewControllerAnimated:YES completion:^ {
         if (completion) {
             completion();
@@ -431,7 +446,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 {
     CGRect cropFrame = self.cropView.croppedImageFrame;
     NSInteger angle = self.cropView.angle;
-
+    
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
         TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle];
@@ -454,7 +469,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         }
         
         __weak typeof(activityController) blockController = activityController;
-        #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
         activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
             if (!completed)
                 return;
@@ -467,7 +482,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                 blockController.completionWithItemsHandler = nil;
             }
         };
-        #else
+#else
         activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
             if (!completed)
                 return;
@@ -480,7 +495,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                 blockController.completionHandler = nil;
             }
         };
-        #endif
+#endif
         
         return;
     }
