@@ -101,6 +101,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
     self.toolbar.clampButton.hidden = self.hideClampButton;
     self.toolbar.resetButton.hidden = true;
+    self.toolbar.rotateButtonHidden = true;
     
     self.transitioningDelegate = self;
     
