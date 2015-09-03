@@ -299,6 +299,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)updateCropBoxFrameWithGesturePoint:(CGPoint)point
 {
+    return;
+    
     CGRect frame = self.cropBoxFrame;
     CGRect originFrame = self.cropOriginFrame;
     CGRect contentFrame = self.contentBounds;
